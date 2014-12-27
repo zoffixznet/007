@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>007 tutorial</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  </head>
+  <body>
+<div class="container">
+<h2 id="overview">Overview</h2>
+<blockquote>
+<p><strong>Q</strong>: Good to see you Mr Bond, things have been awfully dull around here...Now you're on this, I hope we're going to have some gratuitous sex and violence!<br> <strong>James Bond</strong>: I certainly hope so too.</p>
+</blockquote>
+<p>007 is a small language. It has been designed with the purpose of exploring ASTs, macros, the compiler-runtime barrier, and program structure introspection.</p>
+<p>In terms of language features, it's perhaps easiest to think of 007 as the secret love child of Perl 6 and Python.</p>
+<pre><code>                       |  Perl 6          007             Python
+=======================|========================================
+                       |                           :
+                braces |  yes             yes      :      no
+                       |                           :
+user-defined operators |  yes             yes      :      no
+                       |                           :
+ variable declarations |  yes             yes      :      no
+                       |                           :
+                macros |  yes             yes      :      no
+                       |          .................:
+    implicit typecasts |  yes     :       no              no
+                       |          :
+                sigils |  yes     :       no              no
+                       |          :
+                multis |  yes     :       no              no
+                       |          :
+      explicit returns |  yes     :       no              no
+                       |</code></pre>
+<h2 id="values">Values</h2>
+<p>A small number of values in 007 can be expressed using literal syntax.</p>
+<pre><code>123                 Q::Literal::Int
+&quot;Bond.&quot;             Q::Literal::Str
+[0, 0, 7]           Q::Literal::Array</code></pre>
+<p>Only double quotes are allowed. Strings don't have any form of interpolation.</p>
+<p>There's also a singleton type <code>None</code>. The value is generated for undeclared variables calls without a <code>return</code>, but there is no literal form to produce it.</p>
+<h2 id="expressions">Expressions</h2>
+<blockquote>
+<p><strong>James Bond</strong>: A gun and a radio. It's not exactly Christmas, is it?<br> <strong>Q</strong>: Were you expecting an exploding pen? We don't really go in for that anymore.</p>
+</blockquote>
+<p>You can add integers together, and negate them.</p>
+<pre><code>40 + 2              Q::Infix::Addition
+-42                 Q::Prefix::Minus</code></pre>
+<p>Strings can be concatenated.</p>
+<pre><code>&quot;Bo&quot; ~ &quot;nd.&quot;        Q::Infix::Concat</code></pre>
+<p>Arrays can be indexed. (Strings can't, but there's a builtin for that.)</p>
+<pre><code>ar[3]               Q::Postfix::Index</code></pre>
+<p>There's an assignment operator, and a comparison operator. These work on all types.</p>
+<pre><code>name = &quot;Bond&quot;       Q::Infix::Assignment
+42 == 40 + 2        Q::Infix::Eq</code></pre>
+<p>There is no boolean type; comparison yields <code>1</code> and <code>0</code>. Comparison is strict, in the sense that <code>7</code> and <code>&quot;7&quot;</code> are not considered equal under <code>==</code>, and an array is never equal to an int, not even the length of the array.</p>
+<p>The only thing that can be assigned to is variables. Arrays are immutable values, and you can't assign to <code>ar[3]</code>, for example.</p>
+<pre><code>ar[3] = &quot;hammer&quot;;   # error; can&#39;t touch this</code></pre>
+<p>Operands don't need to be simple values. Arbitrarily large expressions can be built. Parentheses can be used to explicitly show evaluation order.</p>
+<pre><code>10 + -(2 + int(&quot;3&quot; ~ &quot;4&quot;))</code></pre>
+<h2 id="variables">Variables</h2>
+<p>In order to be able to read and write a variable, you must first declare it.</p>
+<pre><code>my name;            Q::Statement::My</code></pre>
+<p>As part of the declaration, you can also do an assignment.</p>
+<pre><code>my name = &quot;Bond&quot;;</code></pre>
+<p>Variables are only visible for the rest of the scope they are declared in. All scopes are delimited by braces, except for the scope delimiting the whole program.</p>
+<pre><code>{
+    my drink = &quot;Dry Martini&quot;;
+    say(drink);     # works
+}
+say(drink);         # fails, no longer visible</code></pre>
+<p>It's fine for a variable in an inner scope to have the same name as one in an outer scope. The inner variable will then &quot;shadow&quot; the outer until it's no longer visible.</p>
+<pre><code>var x = 1;
+{
+    var x = 2;
+    say(x);         # 2
+}
+say(x);             # 1</code></pre>
+<h2 id="statements">Statements</h2>
+<blockquote>
+<p><strong>Q</strong>: It is to be handled with special care!<br> <strong>Bond</strong>: Everything you give me...<br> <strong>Q</strong>: ...is treated with equal contempt. Yes, I know.</p>
+</blockquote>
+<p>We've seen two types of statement already: variable declarations, and expression statements.</p>
+<pre><code>my name = &quot;Bond&quot;;   Q::Statement::My
+say(2 + 2);         Q::Statement::Expr</code></pre>
+<p>Expression statements are generally used for their side effects, so they tend to either call some routine or assign to some variable. However, this is not a requirement, and an expression statement can contain any valid expression.</p>
+<p>Besides these simple statements, there are also a few compound statements for conditionals and loops.</p>
+<pre><code>if 2 + 2 == 4 {}    Q::Statement::If
+for xs -&gt; x {}      Q::Statement::For
+while agent {}      Q::Statement::While</code></pre>
+<p>There is also an immediate block statement. Immediate blocks run unconditionally, as if they were an <code>if 1 {}</code> statement.</p>
+<pre><code>{ say(&quot;hi&quot;) }       Q::Statement::Block</code></pre>
+<h2 id="blocks-and-subroutines">Blocks and subroutines</h2>
+<p>There is a fourth type of literal: blocks are values, too.</p>
+<pre><code>{ say(&quot;hi&quot;) }       Q::Literal::Block
+-&gt; x { say(x) }     same, but with a parameter</code></pre>
+<p>Note that in order not to be treated like an immediate block, a block literal must not occur first in a statement.</p>
+<p>If the optional arrow (<code>-&gt;</code>) is specified, the block can declare parameters. These are bound to arguments passed in when a block is called.</p>
+<pre><code>my g = -&gt; name { say(&quot;Greetings, &quot; ~ name) };
+g(&quot;Mr. Bond&quot;);</code></pre>
+<p>The parentheses in the call are mandatory. There is no <code>g &quot;Mr. Bond&quot;;</code> listop form.</p>
+<p>Subroutines are similar to blocks, but they are declared with a name and a (non-optional) parameter list.</p>
+<pre><code>sub f(x) {}         Q::Statement::Sub</code></pre>
+<p>When calling a subroutine or a block, the number of arguments must equal the number of parameters.</p>
+<p>On the face of it, there isn't much difference between putting a block in a variable, and declaring a sub:</p>
+<pre><code>my f1 = -&gt; name { say(name) };
+sub f2(name) {
+    say(name);
+}
+
+f1(&quot;James Bond&quot;);
+f2(&quot;James Bond&quot;);</code></pre>
+<p>There is a difference, though: subroutines can return values, and blocks can't.</p>
+<pre><code>return 42;          Q::Statement::Return</code></pre>
+<p>A return statement finds the lexically surrounding subroutine, and returns from it. Blocks are transparent to this process; a <code>return</code> simply doesn't see blocks.</p>
+<pre><code>sub outer() {
+    my inner = {
+        return 42;
+    }
+    inner();
+    say(&quot;not printed&quot;);
+}
+say(outer());</code></pre>
+<h2 id="begin-and-constants"><code>BEGIN</code> and constants</h2>
+<p><code>BEGIN</code> blocks are blocks of code that run as soon as the parser has parsed the ending brace (<code>}</code>) of the block.</p>
+<pre><code>BEGIN {}            Q::Statement::BEGIN</code></pre>
+<p>There is no statement form of <code>BEGIN</code>: you must put in the braces.</p>
+<p>There's also a <code>constant</code> declaration statement:</p>
+<pre><code>constant pi = 3;    Q::Statement::Constant</code></pre>
+<p>The right-hand side of the <code>constant</code> declaration is evaluated at parse time, making it functionally similar to using a BEGIN block to do the assignment:</p>
+<pre><code>my pi;
+BEGIN {
+    pi = 3;
+}</code></pre>
+<p>Constants cannot be assigned to after their declaration. Because of this, the assignment in the <code>constant</code> declaration is mandatory.</p>
+<h2 id="setting">Setting</h2>
+<p>There's a scope outside the program scope, containing a utility subroutines. These should be fairly self-explanatory.</p>
+<pre><code>say(o)
+type(o)
+str(o)
+int(o)
+
+abs(n)
+min(n)
+max(n)
+chr(n)
+
+ord(c)
+chars(s)
+uc(s)
+lc(s)
+trim(s)
+split(s, sep)
+index(s, substr)
+charat(s, pos)
+substr(s, pos, chars?)
+
+elems(a)
+reversed(a)
+sorted(a)
+join(a, sep)
+grep(fn, a)
+map(fn, a)</code></pre>
+<p>There are also constructor methods for creating program elements.</p>
+<pre><code>Q::Literal::Int(int)
+Q::Literal::Str(str)
+Q::Literal::Array(array)
+Q::Literal::Block(params, stmts)
+Q::Identifier(array)
+Q::Statements(array)
+Q::Parameters(array)
+Q::Arguments(array)
+Q::Prefix::Minus(expr)
+Q::Infix::Addition(lhs, expr)
+Q::Infix::Concat(lhs, expr)
+Q::Infix::Assignment(lhs, expr)
+Q::Infix::Eq(lhs, expr)
+Q::Postfix::Call(lhs, args)
+Q::Postfix::Index(lhs, rhs)
+Q::Statement::My(ident, assign?)
+Q::Statement::Constant(ident, assign)
+Q::Statement::Expr(expr)
+Q::Statement::If(expr, block)
+Q::Statement::Block(block)
+Q::Statement::Sub(ident, params, block)
+Q::Statement::Macro(ident, params, block)
+Q::Statement::Return(expr?)
+Q::Statement::For(expr, block)
+Q::Statement::While(expr, block)
+Q::Statement::BEGIN(block)</code></pre>
+<p>If you put an expression into a <code>Q::Statement::Expr</code> by passing it to its constructor, you can get it out of the resulting Q object by calling the destructor <code>expr(q)</code>. All the parameter names above are also represented as destructors in the setting.</p>
+<h2 id="macros">Macros</h2>
+<blockquote>
+<p><strong>Q</strong>: Now, look...<br> <strong>Bond</strong>: So where is this cutting edge stuff?<br> <strong>Q</strong>: I'm trying to get to it!</p>
+</blockquote>
+<p>Macros are a form of routine, just like subs.</p>
+<pre><code>macro m(q) {}       Q::Statement::Macro</code></pre>
+<p>When a call to a macro is seen in the source code, the compiler will call the macro, and then install whatever code the macro said to return.</p>
+<pre><code>macro greet() {
+    return Q::Expr::Call::Sub(
+        Q::Identifier(&quot;say&quot;),
+        Q::Arguments([Q::Literal::Str(&quot;Mr Bond!&quot;)]));
+}
+
+greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
+<h2 id="quasis">Quasis</h2>
+<blockquote>
+<p><strong>Q</strong>: Right. Now pay attention, 007. I want you to take great care of this equipment. There are one or two rather special accessories...<br> <strong>James Bond</strong>: Q, have I ever let you down?<br> <strong>Q</strong>: Frequently.</p>
+</blockquote>
+<p>It's sometimes convenient to express code as Qtree constructors, like above, and sometimes convenient to express it as code. Quasis are for the latter case.</p>
+<pre><code>macro greet() {
+    quasi {
+        say(&quot;Mr Bond!&quot;);
+    }
+}
+
+greet();</code></pre>
+</div>
+  </body>
+</html>
