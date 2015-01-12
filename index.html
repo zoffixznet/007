@@ -112,9 +112,9 @@
 }
 say(drink);         # fails, no longer visible</code></pre>
 <p>It's fine for a variable in an inner scope to have the same name as one in an outer scope. The inner variable will then &quot;shadow&quot; the outer until it's no longer visible.</p>
-<pre><code>var x = 1;
+<pre><code>my x = 1;
 {
-    var x = 2;
+    my x = 2;
     say(x);         # 2
 }
 say(x);             # 1</code></pre>
