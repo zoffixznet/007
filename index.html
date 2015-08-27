@@ -132,27 +132,12 @@ for xs -&gt; x {}      Q::Statement::For
 while agent {}      Q::Statement::While</code></pre>
 <p>There is also an immediate block statement. Immediate blocks run unconditionally, as if they were an <code>if 1 {}</code> statement.</p>
 <pre><code>{ say(&quot;hi&quot;) }       Q::Statement::Block</code></pre>
-<h2 id="blocks-and-subroutines">Blocks and subroutines</h2>
-<p>There is a fourth type of literal: blocks are values, too.</p>
-<pre><code>{ say(&quot;hi&quot;) }       Q::Literal::Block
--&gt; x { say(x) }     same, but with a parameter</code></pre>
-<p>Note that in order not to be treated like an immediate block, a block literal must not occur first in a statement.</p>
-<p>If the optional arrow (<code>-&gt;</code>) is specified, the block can declare parameters. These are bound to arguments passed in when a block is called.</p>
-<pre><code>my g = -&gt; name { say(&quot;Greetings, &quot; ~ name) };
-g(&quot;Mr. Bond&quot;);</code></pre>
-<p>The parentheses in the call are mandatory. There is no <code>g &quot;Mr. Bond&quot;;</code> listop form.</p>
+<h2 id="blocks-and-subroutines">Subroutines</h2>
 <p>Subroutines are similar to blocks, but they are declared with a name and a (non-optional) parameter list.</p>
 <pre><code>sub f(x) {}         Q::Statement::Sub</code></pre>
-<p>When calling a subroutine or a block, the number of arguments must equal the number of parameters.</p>
-<p>On the face of it, there isn't much difference between putting a block in a variable, and declaring a sub:</p>
-<pre><code>my f1 = -&gt; name { say(name) };
-sub f2(name) {
-    say(name);
-}
-
-f1(&quot;James Bond&quot;);
-f2(&quot;James Bond&quot;);</code></pre>
-<p>There is a difference, though: subroutines can return values, and blocks can't.</p>
+<p>When calling a subroutine, the number of arguments must equal the number of parameters.</p>
+<p>The parentheses in the call are mandatory. There is no <code>g &quot;Mr. Bond&quot;;</code> listop form.</p>
+<p>Subroutines can return values.</p>
 <pre><code>return 42;          Q::Statement::Return</code></pre>
 <p>A return statement finds the lexically surrounding subroutine, and returns from it. Blocks are transparent to this process; a <code>return</code> simply doesn't see blocks.</p>
 <pre><code>sub outer() {
@@ -207,7 +192,6 @@ map(fn, a)</code></pre>
 <pre><code>Q::Literal::Int(int)
 Q::Literal::Str(str)
 Q::Literal::Array(array)
-Q::Literal::Block(params, stmts)
 Q::Identifier(array)
 Q::Statements(array)
 Q::Parameters(array)
