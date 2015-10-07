@@ -224,7 +224,7 @@ Q::Statement::BEGIN(block)</code></pre>
 <pre><code>macro m(q) {}       Q::Statement::Macro</code></pre>
 <p>When a call to a macro is seen in the source code, the compiler will call the macro, and then install whatever code the macro said to return.</p>
 <pre><code>macro greet() {
-    return Q::Expr::Call::Sub(
+    return Q::Postfix::Call(
         Q::Identifier(&quot;say&quot;),
         Q::Arguments([Q::Literal::Str(&quot;Mr Bond!&quot;)]));
 }
