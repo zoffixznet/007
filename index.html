@@ -133,7 +133,7 @@ for xs -&gt; x {}      Q::Statement::For
 while agent {}      Q::Statement::While</code></pre>
 <p>There is also an immediate block statement. Immediate blocks run unconditionally, as if they were an <code>if 1 {}</code> statement.</p>
 <pre><code>{ say(&quot;hi&quot;) }       Q::Statement::Block</code></pre>
-<h2 id="blocks-and-subroutines">Subroutines</h2>
+<h2 id="subroutines">Subroutines</h2>
 <p>Subroutines are similar to blocks, but they are declared with a name and a (non-optional) parameter list.</p>
 <pre><code>sub f(x) {}         Q::Statement::Sub</code></pre>
 <p>When calling a subroutine, the number of arguments must equal the number of parameters.</p>
