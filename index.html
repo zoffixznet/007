@@ -14,7 +14,7 @@
 <div class="container">
 <h2 id="overview">Overview</h2>
 <blockquote>
-<p><strong>Q</strong>: Good to see you Mr Bond, things have been awfully dull around here...Now you're on this, I hope we're going to have some gratuitous sex and violence!<br> <strong>James Bond</strong>: I certainly hope so too.</p>
+<p><strong>Q</strong>: Good to see you Mr Bond, things have been awfully dull around here...Now you're on this, I hope we're going to have some gratuitous sex and violence!<br><strong>James Bond</strong>: I certainly hope so too.</p>
 </blockquote>
 <p>007 is a small language. It has been designed with the purpose of exploring ASTs, macros, the compiler-runtime barrier, and program structure introspection.</p>
 <p>In terms of language features, it's perhaps easiest to think of 007 as the secret love child of Perl 6 and Python.</p>
@@ -84,7 +84,7 @@ None                Q::Literal::None</code></pre>
 <p>The <code>None</code> value is a singleton. It's the value of unassigned variables and subroutines that don't <code>return</code> anything.</p>
 <h2 id="expressions">Expressions</h2>
 <blockquote>
-<p><strong>James Bond</strong>: A gun and a radio. It's not exactly Christmas, is it?<br> <strong>Q</strong>: Were you expecting an exploding pen? We don't really go in for that anymore.</p>
+<p><strong>James Bond</strong>: A gun and a radio. It's not exactly Christmas, is it?<br><strong>Q</strong>: Were you expecting an exploding pen? We don't really go in for that anymore.</p>
 </blockquote>
 <p>You can add integers together, and negate them.</p>
 <pre><code>40 + 2              Q::Infix::Addition
@@ -121,7 +121,7 @@ say(drink);         # fails, no longer visible</code></pre>
 say(x);             # 1</code></pre>
 <h2 id="statements">Statements</h2>
 <blockquote>
-<p><strong>Q</strong>: It is to be handled with special care!<br> <strong>Bond</strong>: Everything you give me...<br> <strong>Q</strong>: ...is treated with equal contempt. Yes, I know.</p>
+<p><strong>Q</strong>: It is to be handled with special care!<br><strong>Bond</strong>: Everything you give me...<br><strong>Q</strong>: ...is treated with equal contempt. Yes, I know.</p>
 </blockquote>
 <p>We've seen two types of statement already: variable declarations, and expression statements.</p>
 <pre><code>my name = &quot;Bond&quot;;   Q::Statement::My
@@ -218,7 +218,7 @@ Q::Statement::BEGIN(block)</code></pre>
 <p>If you put an expression into a <code>Q::Statement::Expr</code> by passing it to its constructor, you can get it out of the resulting Q object by calling the destructor <code>expr(q)</code>. All the parameter names above are also represented as destructors in the setting.</p>
 <h2 id="macros">Macros</h2>
 <blockquote>
-<p><strong>Q</strong>: Now, look...<br> <strong>Bond</strong>: So where is this cutting edge stuff?<br> <strong>Q</strong>: I'm trying to get to it!</p>
+<p><strong>Q</strong>: Now, look...<br><strong>Bond</strong>: So where is this cutting edge stuff?<br><strong>Q</strong>: I'm trying to get to it!</p>
 </blockquote>
 <p>Macros are a form of routine, just like subs.</p>
 <pre><code>macro m(q) {}       Q::Statement::Macro</code></pre>
@@ -232,7 +232,7 @@ Q::Statement::BEGIN(block)</code></pre>
 greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
 <h2 id="quasis">Quasis</h2>
 <blockquote>
-<p><strong>Q</strong>: Right. Now pay attention, 007. I want you to take great care of this equipment. There are one or two rather special accessories...<br> <strong>James Bond</strong>: Q, have I ever let you down?<br> <strong>Q</strong>: Frequently.</p>
+<p><strong>Q</strong>: Right. Now pay attention, 007. I want you to take great care of this equipment. There are one or two rather special accessories...<br><strong>James Bond</strong>: Q, have I ever let you down?<br><strong>Q</strong>: Frequently.</p>
 </blockquote>
 <p>It's sometimes convenient to express code as Qtree constructors, like above, and sometimes convenient to express it as code. Quasis are for the latter case.</p>
 <pre><code>macro greet() {
