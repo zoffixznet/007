@@ -243,6 +243,17 @@ greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
 }
 
 greet();</code></pre>
+<p>Quasis can contain <em>unquotes</em>, where we momentarily jump back from code to Qtrees. Mixing code and Qtrees like that is the main point of quasis. For instance, instead of specifying the string directly as above, we can construct the Q node for it, and inject it:</p>
+<pre><code>constant greeting_ast = Q::Literal::Str(&quot;Mr Bond!&quot;);
+
+macro greet() {
+    return quasi {
+        say({{{greeting_ast}}});
+    }
+}
+
+greet();</code></pre>
+<p>Note the need for <code>constant</code> in the mainline, because the macro <code>greet</code> runs very early. If we moved <code>greeting_ast</code> into the macro body, we could use <code>my</code>.</p>
 </div>
   </body>
 </html>
