@@ -194,10 +194,12 @@ map(fn, array)</code></pre>
 Q::Literal::Str(value)
 Q::Literal::Array(value)
 Q::Identifier(str)
-Q::Statements(array)
-Q::Parameters(array)
-Q::Arguments(array)
-Q::Block(params, stmts)
+Q::StatementList(array)
+Q::ParameterList(array)
+Q::ArgumentList(array)
+Q::Block(paramlist, stmtlist)
+Q::Quasi(stmtlist)
+Q::Trait(ident, expr)
 Q::Prefix::Minus(expr)
 Q::Infix::Addition(lhs, rhs)
 Q::Infix::Concat(lhs, rhs)
@@ -205,13 +207,13 @@ Q::Infix::Assignment(lhs, rhs)
 Q::Infix::Eq(lhs, rhs)
 Q::Postfix::Call(lhs, args)
 Q::Postfix::Index(lhs, rhs)
-Q::Statement::My(ident, assign?)
-Q::Statement::Constant(ident, assign)
+Q::Statement::My(ident, expr?)
+Q::Statement::Constant(ident, expr)
 Q::Statement::Expr(expr)
 Q::Statement::If(expr, block)
 Q::Statement::Block(block)
-Q::Statement::Sub(ident, params, block)
-Q::Statement::Macro(ident, params, block)
+Q::Statement::Sub(ident, paramlist, block)
+Q::Statement::Macro(ident, paramlist, block)
 Q::Statement::Return(expr?)
 Q::Statement::For(expr, block)
 Q::Statement::While(expr, block)
@@ -227,7 +229,7 @@ Q::Statement::BEGIN(block)</code></pre>
 <pre><code>macro greet() {
     return Q::Postfix::Call(
         Q::Identifier(&quot;say&quot;),
-        Q::Arguments([Q::Literal::Str(&quot;Mr Bond!&quot;)]));
+        Q::ArgumentList([Q::Literal::Str(&quot;Mr Bond!&quot;)]));
 }
 
 greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
@@ -237,7 +239,7 @@ greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
 </blockquote>
 <p>It's sometimes convenient to express code as Qtree constructors, like above, and sometimes convenient to express it as code. Quasis are for the latter case.</p>
 <pre><code>macro greet() {
-    quasi {
+    return quasi {
         say(&quot;Mr Bond!&quot;);
     }
 }
