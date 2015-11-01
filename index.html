@@ -78,8 +78,8 @@
 <p>A small number of values in 007 can be expressed using literal syntax.</p>
 <pre><code>123                 Q::Literal::Int
 &quot;Bond.&quot;             Q::Literal::Str
-[0, 0, 7]           Q::Literal::Array
-None                Q::Literal::None</code></pre>
+None                Q::Literal::None
+[0, 0, 7]           Q::Term::Array</code></pre>
 <p>Only double quotes are allowed. Strings don't have any form of interpolation.</p>
 <p>The <code>None</code> value is a singleton. It's the value of unassigned variables and subroutines that don't <code>return</code> anything.</p>
 <h2 id="expressions">Expressions</h2>
@@ -192,13 +192,13 @@ map(fn, array)</code></pre>
 <p>There are also constructor methods for creating program elements.</p>
 <pre><code>Q::Literal::Int(value)
 Q::Literal::Str(value)
-Q::Literal::Array(value)
+Q::Term::Array(value)
+Q::Term::Quasi(block)
 Q::Identifier(str)
 Q::StatementList(array)
 Q::ParameterList(array)
 Q::ArgumentList(array)
 Q::Block(paramlist, stmtlist)
-Q::Quasi(stmtlist)
 Q::Trait(ident, expr)
 Q::Prefix::Minus(expr)
 Q::Infix::Addition(lhs, rhs)
