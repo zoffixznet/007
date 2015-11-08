@@ -1,0 +1,102 @@
+sub infix:<»=>(l, r) {
+    return min(l, r) == r;
+}
+
+constant PIN   = "    |    ";
+
+constant DISK = {
+    tiny:  "   ===   ",
+    small: "  =====  ",
+    large: " ======= ",
+    huge:  "========="
+};
+
+my state = [
+    [DISK.huge, DISK.large, DISK.small, DISK.tiny],
+    [],
+    []
+];
+
+sub upto(n) {
+    my c = -1;
+    sub counter(irrelevant_I) {
+        c = c + 1;
+        return c;
+    }
+
+    return map(counter, [1] xx n);
+}
+
+sub pop(n) {
+    sub pop_from_nth_pile(nth) {
+        my pile = state[nth];
+        if n != nth {
+            return pile;
+        }
+
+        sub pile_item(i) { return pile[i] }
+
+        return map(pile_item, upto(elems(pile) - 1));
+    }
+
+    my L = elems(state[n]) - 1;
+    my disk = state[n][L];
+    state = map(pop_from_nth_pile, upto(3));
+    return disk;
+}
+
+sub push(disk, n) {
+    sub push_to_nth_pile(nth) {
+        my pile = state[nth];
+        if n != nth {
+            return pile;
+        }
+
+        sub pile_item(i) {
+            if i == elems(pile) {
+                return disk;
+            }
+            return pile[i];
+        }
+
+        return map(pile_item, upto(elems(pile) + 1));
+    }
+
+    state = map(push_to_nth_pile, upto(3));
+}
+
+sub tw(n, L) {
+    my e = elems(state[n]);
+    if L »= e {
+        return PIN;
+    }
+    return state[n][L];
+}
+
+sub show() {
+    for reversed(upto(5)) -> L {
+        say(tw(0, L) ~ " " ~ tw(1, L) ~ " " ~ tw(2, L));
+    }
+}
+
+sub move(diskname, from, to) {
+    say("");
+    say("Moving " ~ diskname ~ " from pile " ~ str(from + 1) ~ " to pile " ~ str(to + 1) ~ "...");
+    say("");
+    my disk = pop(from);
+    push(disk, to);
+    show();
+}
+
+sub solve_hanoi(n, from, helper, to) {
+    if n »= 2 {
+        solve_hanoi(n - 1, from, to, helper);
+    }
+    move(["tiny disk", "small disk", "large disk", "huge disk"][n - 1], from, to);
+    if n »= 2 {
+        solve_hanoi(n - 1, helper, from, to);
+    }
+}
+
+show();
+solve_hanoi(4, 0, 1, 2);
