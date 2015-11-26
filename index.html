@@ -79,7 +79,8 @@
 <pre><code>123                 Q::Literal::Int
 &quot;Bond.&quot;             Q::Literal::Str
 None                Q::Literal::None
-[0, 0, 7]           Q::Term::Array</code></pre>
+[0, 0, 7]           Q::Term::Array
+{ name: &quot;Bond&quot; }    Q::Term::Object</code></pre>
 <p>Only double quotes are allowed. Strings don't have any form of interpolation.</p>
 <p>The <code>None</code> value is a singleton. It's the value of unassigned variables and subroutines that don't <code>return</code> anything.</p>
 <h2 id="expressions">Expressions</h2>
@@ -189,36 +190,22 @@ sorted(array)
 join(array, sep)
 filter(fn, array)
 map(fn, array)</code></pre>
-<p>There are also constructor methods for creating program elements.</p>
-<pre><code>Q::Literal::Int(value)
-Q::Literal::Str(value)
-Q::Term::Array(value)
-Q::Term::Quasi(block)
-Q::Identifier(str)
-Q::StatementList(array)
-Q::ParameterList(array)
-Q::ArgumentList(array)
-Q::Block(paramlist, stmtlist)
-Q::Trait(ident, expr)
-Q::Prefix::Minus(expr)
-Q::Infix::Addition(lhs, rhs)
-Q::Infix::Concat(lhs, rhs)
-Q::Infix::Assignment(lhs, rhs)
-Q::Infix::Eq(lhs, rhs)
-Q::Postfix::Call(lhs, args)
-Q::Postfix::Index(lhs, rhs)
-Q::Statement::My(ident, expr?)
-Q::Statement::Constant(ident, expr)
-Q::Statement::Expr(expr)
-Q::Statement::If(expr, block)
-Q::Statement::Block(block)
-Q::Statement::Sub(ident, block)
-Q::Statement::Macro(ident, block)
-Q::Statement::Return(expr?)
-Q::Statement::For(expr, block)
-Q::Statement::While(expr, block)
-Q::Statement::BEGIN(block)</code></pre>
-<p>If you put an expression into a <code>Q::Statement::Expr</code> by passing it to its constructor, you can get it out of the resulting Q object by calling the destructor <code>expr(q)</code>. All the parameter names above are also represented as destructors in the setting.</p>
+<h2 id="objects">Objects</h2>
+<p>Object terms are delimited by braces, and contain property declarations separated by commas:</p>
+<pre><code>{ name: &quot;Bond&quot;, agency: &quot;MI6&quot; }</code></pre>
+<p>Property keys can be quoted, for example when they aren't simple identifiers:</p>
+<pre><code>{ &quot;no, Mr Bond&quot;: &quot;I expect you to die&quot; }</code></pre>
+<p>There's also syntactic sugar for defining properties with function values, making these two forms more or less equivalent:</p>
+<pre><code>{ quip() { say(&quot;I&#39;d say one of their aircraft is missing&quot;) } }
+
+sub quip() { say(&quot;I&#39;d say one of their aircraft is missing&quot;) }
+{ quip: quip }</code></pre>
+<h2 id="q-objects">Q objects</h2>
+<p>All the different Q types can be created by specifying the type before an object term:</p>
+<pre><code>my q = Q::Statement::My {
+    ident: Q::Identifier { name: &quot;name&quot; },
+    expr: Q::Literal::Str { value: &quot;Bond&quot; }
+};</code></pre>
 <h2 id="macros">Macros</h2>
 <blockquote>
 <p><strong>Q</strong>: Now, look...<br><strong>Bond</strong>: So where is this cutting edge stuff?<br><strong>Q</strong>: I'm trying to get to it!</p>
@@ -227,9 +214,12 @@ Q::Statement::BEGIN(block)</code></pre>
 <pre><code>macro m(q) {}       Q::Statement::Macro</code></pre>
 <p>When a call to a macro is seen in the source code, the compiler will call the macro, and then install whatever code the macro said to return.</p>
 <pre><code>macro greet() {
-    return Q::Postfix::Call(
-        Q::Identifier(&quot;say&quot;),
-        Q::ArgumentList([Q::Literal::Str(&quot;Mr Bond!&quot;)]));
+    return Q::Postfix::Call {
+        expr: Q::Identifier { name: &quot;say&quot; },
+        argumentlist: Q::ArgumentList {
+            [Q::Literal::Str { value: &quot;Mr Bond!&quot; }]
+        }
+    };
 }
 
 greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
@@ -246,7 +236,7 @@ greet();    # prints &quot;Mr Bond!&quot; when run</code></pre>
 
 greet();</code></pre>
 <p>Quasis can contain <em>unquotes</em>, where we momentarily jump back from code to Qtrees. Mixing code and Qtrees like that is the main point of quasis. For instance, instead of specifying the string directly as above, we can construct the Q node for it, and inject it:</p>
-<pre><code>constant greeting_ast = Q::Literal::Str(&quot;Mr Bond!&quot;);
+<pre><code>constant greeting_ast = Q::Literal::Str { value: &quot;Mr Bond!&quot; };
 
 macro greet() {
     return quasi {
